@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Collège Plus — cours et révisions</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #172033;
+      background: #f5f7fb;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --green: #14845b;
+      --green-dark: #096846;
+      --green-soft: #e8f6ef;
+      --border: #e3e8ef;
+      --muted: #647084;
+      --panel: #fff;
+      --shadow: 0 12px 35px rgb(26 39 61 / 7%);
+    }
+
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgb(20 132 91 / 28%);
+      outline-offset: 2px;
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 5; background: rgb(255 255 255 / 94%);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(12px);
+    }
+    .topbar-inner {
+      max-width: 1380px; min-height: 76px; margin: auto; padding: 12px 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: max-content; }
+    .brand-mark {
+      display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px;
+      color: #fff; background: linear-gradient(145deg, #18a66f, #08744f); font-size: 23px;
+      box-shadow: 0 6px 16px rgb(20 132 91 / 22%);
+    }
+    .brand-name { font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .brand-note { display: inline-block; margin-left: 7px; color: var(--green-dark); font-size: 11px; font-weight: 700; }
+    .level-tabs { display: flex; gap: 5px; padding: 5px; border: 1px solid var(--border); border-radius: 14px; background: #f5f7fa; }
+    .level-tab {
+      border: 0; border-radius: 10px; padding: 10px 15px; color: var(--muted);
+      background: transparent; font-size: 13px; font-weight: 750;
+    }
+    .level-tab[aria-pressed="true"] { color: var(--green-dark); background: #fff; box-shadow: 0 2px 8px rgb(26 39 61 / 9%); }
+    .primary-button, .secondary-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: 0; border-radius: 11px; padding: 11px 15px; font-size: 13px; font-weight: 750;
+    }
+    .primary-button { color: white; background: #18243a; }
+    .primary-button:hover { background: #263650; }
+    .secondary-button { color: var(--green-dark); background: var(--green-soft); }
+    .secondary-button:hover { background: #d7efdf; }
+    main {
+      max-width: 1380px; margin: auto; padding: 28px;
+      display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(330px, .8fr);
+      align-items: start; gap: 24px;
+    }
+    .library { min-width: 0; }
+    .banner {
+      position: relative; overflow: hidden; min-height: 178px; padding: 27px 30px;
+      border-radius: 20px; color: #fff;
+      background: linear-gradient(115deg, #176b9b, #354fba);
+      box-shadow: 0 14px 28px rgb(38 80 165 / 17%);
+    }
+    .banner[data-level="1ACSC"] { background: linear-gradient(115deg, #176b9b, #354fba); }
+    .banner[data-level="3ACSC"] { background: linear-gradient(115deg, #7139b4, #4838a1); }
+    .banner::after {
+      content: ""; position: absolute; width: 190px; height: 190px; right: -40px; bottom: -100px;
+      border: 28px solid rgb(255 255 255 / 10%); border-radius: 50%;
+    }
+    .eyebrow {
+      display: inline-block; padding: 6px 10px; border: 1px solid rgb(255 255 255 / 25%);
+      border-radius: 99px; background: rgb(255 255 255 / 15%); font-size: 11px;
+      font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .banner h1 { margin: 13px 0 7px; font-size: clamp(22px, 3vw, 29px); letter-spacing: -.6px; }
+    .banner p { max-width: 680px; margin: 0; color: rgb(255 255 255 / 85%); font-size: 14px; line-height: 1.6; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 23px 0 15px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter-button {
+      padding: 8px 11px; border: 1px solid var(--border); border-radius: 10px;
+      color: #536075; background: white; font-size: 12px; font-weight: 700;
+    }
+    .filter-button[aria-pressed="true"] { border-color: #18243a; color: white; background: #18243a; }
+    .search-wrap { position: relative; flex: 0 1 250px; min-width: 175px; }
+    .search-wrap span { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); }
+    .search-wrap input {
+      width: 100%; padding: 10px 12px 10px 37px; border: 1px solid var(--border);
+      border-radius: 11px; background: #fff; font-size: 12px;
+    }
+    .section-heading { display: flex; justify-content: space-between; align-items: baseline; margin: 18px 0 11px; }
+    .section-heading h2 { margin: 0; font-size: 17px; }
+    .section-heading span { color: var(--muted); font-size: 12px; }
+    .course-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+    .course-card {
+      display: flex; flex-direction: column; min-height: 184px; padding: 17px;
+      border: 1px solid var(--border); border-radius: 16px; background: var(--panel);
+      box-shadow: 0 3px 12px rgb(26 39 61 / 3%); transition: transform .16s, box-shadow .16s;
+    }
+    .course-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .card-top, .card-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .subject-tag {
+      display: inline-block; padding: 5px 8px; border-radius: 8px;
+      color: #245c9e; background: #eaf2ff; font-size: 10px; font-weight: 800;
+    }
+    .subject-tag[data-subject="Français"] { color: #95620b; background: #fff4d9; }
+    .subject-icon { font-size: 20px; }
+    .course-card h3 { margin: 13px 0 6px; font-size: 14px; line-height: 1.4; }
+    .course-card p { margin: 0 0 16px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .card-actions { margin-top: auto; padding-top: 11px; border-top: 1px solid #eef0f4; }
+    .text-button { padding: 3px 0; border: 0; color: var(--green-dark); background: none; font-size: 12px; font-weight: 800; }
+    .empty-state {
+      grid-column: 1 / -1; padding: 36px 20px; border: 1px dashed #cbd3df;
+      border-radius: 16px; color: var(--muted); background: #fff; text-align: center;
+    }
+    .empty-state strong { display: block; margin-bottom: 5px; color: #27344a; }
+    .lesson {
+      margin-top: 18px; padding: 22px; border: 1px solid var(--border); border-radius: 17px;
+      background: #fff; box-shadow: var(--shadow);
+    }
+    .lesson[hidden] { display: none; }
+    .lesson-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 15px; border-bottom: 1px solid #edf0f4; }
+    .lesson h2 { margin: 10px 0 0; font-size: 20px; }
+    .lesson-content { max-height: 430px; overflow: auto; padding: 12px 3px; color: #3e4a5e; font-size: 14px; line-height: 1.75; white-space: pre-line; }
+    .lesson-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid #edf0f4; }
+    .tutor {
+      position: sticky; top: 95px; display: flex; flex-direction: column; height: min(760px, calc(100vh - 120px));
+      min-height: 530px; overflow: hidden; border: 1px solid var(--border); border-radius: 19px;
+      background: white; box-shadow: var(--shadow);
+    }
+    .tutor-header { display: flex; justify-content: space-between; align-items: center; padding: 17px; color: white; background: #18243a; }
+    .tutor-brand { display: flex; align-items: center; gap: 11px; }
+    .tutor-avatar { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(145deg, #18a66f, #08744f); font-size: 20px; }
+    .tutor-header h2 { margin: 0 0 4px; font-size: 14px; }
+    .tutor-header p { margin: 0; color: #b7c1d0; font-size: 11px; }
+    .icon-button { padding: 8px; border: 0; border-radius: 9px; color: inherit; background: transparent; font-size: 16px; }
+    .icon-button:hover { background: rgb(255 255 255 / 12%); }
+    .tutor-context { display: flex; justify-content: space-between; gap: 8px; padding: 10px 15px; border-bottom: 1px solid var(--border); color: #526075; background: #f7f8fa; font-size: 11px; }
+    .tutor-context strong { color: #172033; }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 13px; padding: 16px; background: #f7f8fb; }
+    .message { display: flex; gap: 8px; align-items: flex-start; }
+    .message.user { flex-direction: row-reverse; }
+    .message-avatar { display: grid; place-items: center; flex: 0 0 27px; height: 27px; border-radius: 8px; color: white; background: var(--green); font-size: 13px; }
+    .message.user .message-avatar { background: #27344a; }
+    .message-bubble {
+      max-width: 88%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 13px;
+      border-top-left-radius: 4px; color: #253147; background: white; font-size: 12px; line-height: 1.65;
+      white-space: pre-wrap; overflow-wrap: anywhere;
+    }
+    .message.user .message-bubble { border-color: var(--green); border-radius: 13px 4px 13px 13px; color: white; background: var(--green); }
+    .suggestions { display: flex; gap: 7px; overflow-x: auto; padding: 10px; border-top: 1px solid #edf0f4; }
+    .suggestions button { flex: 0 0 auto; padding: 7px 9px; border: 1px solid var(--border); border-radius: 99px; color: #536075; background: #f7f8fa; font-size: 10px; font-weight: 700; }
+    .suggestions button:hover { color: var(--green-dark); background: var(--green-soft); }
+    .chat-form { display: flex; gap: 8px; padding: 11px; border-top: 1px solid var(--border); }
+    .chat-form input { min-width: 0; flex: 1; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px; background: #f7f8fa; font-size: 12px; }
+    .chat-form button { width: 40px; border: 0; border-radius: 10px; color: white; background: var(--green); font-size: 17px; }
+    dialog { width: min(540px, calc(100% - 28px)); max-height: 90vh; padding: 0; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 24px 70px rgb(16 28 45 / 25%); }
+    dialog::backdrop { background: rgb(13 23 39 / 55%); backdrop-filter: blur(3px); }
+    .dialog-inner { padding: 23px; }
+    .dialog-heading { display: flex; justify-content: space-between; align-items: center; padding-bottom: 13px; border-bottom: 1px solid #edf0f4; }
+    .dialog-heading h2 { margin: 0; font-size: 18px; }
+    .close-dialog { border: 0; color: var(--muted); background: none; font-size: 22px; }
+    .course-form { display: grid; gap: 13px; padding-top: 15px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .course-form label { display: grid; gap: 6px; color: #39465b; font-size: 12px; font-weight: 750; }
+    .course-form input, .course-form select, .course-form textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 9px; background: #fbfcfe; font-size: 13px; }
+    .course-form textarea { resize: vertical; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+    .notice { position: fixed; right: 20px; bottom: 20px; z-index: 10; max-width: min(440px, calc(100vw - 40px)); padding: 12px 15px; border-radius: 11px; color: white; background: #263650; box-shadow: var(--shadow); font-size: 13px; }
+    .notice[hidden] { display: none; }
+    footer { padding: 0 28px 25px; color: #7b8595; text-align: center; font-size: 11px; }
+    @media (max-width: 940px) {
+      .topbar-inner { padding-inline: 18px; flex-wrap: wrap; }
+      main { grid-template-columns: 1fr; padding: 20px 18px; }
+      .tutor { position: static; height: 620px; }
+    }
+    @media (max-width: 600px) {
+      .topbar-inner { justify-content: space-between; gap: 10px; }
+      .brand-name { font-size: 17px; }
+      .brand-note { display: none; }
+      .level-tabs { order: 3; width: 100%; }
+      .level-tab { flex: 1; padding: 9px 5px; }
+      .topbar-inner > .primary-button { padding: 10px; font-size: 12px; }
+      main { padding: 16px 13px; gap: 18px; }
+      .banner { min-height: auto; padding: 22px; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .search-wrap { flex-basis: auto; }
+      .course-grid { grid-template-columns: 1fr; }
+      .course-card { min-height: 165px; }
+      .lesson { padding: 17px; }
+      .lesson-actions { align-items: flex-start; flex-direction: column; }
+      .tutor { height: 590px; min-height: 500px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Collège Plus, plateforme éducative">
+        <div class="brand-mark" aria-hidden="true">♫</div>
+        <div><span class="brand-name">PROF. ABDELGHANI</span><span class="brand-note">COURS DE FRANÇAIS</span></div>
+      </div>
+      <nav class="level-tabs" aria-label="Choisir le niveau">
+        <button class="level-tab" type="button" data-level="1ACSC" aria-pressed="false">1ère année</button>
+        <button class="level-tab" type="button" data-level="2ACSC" aria-pressed="true">2ème année</button>
+        <button class="level-tab" type="button" data-level="3ACSC" aria-pressed="false">3ème année</button>
+      </nav>
+      <button class="primary-button" id="open-course-form" type="button"><span aria-hidden="true">＋</span> Ajouter un cours</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="library" aria-label="Bibliothèque de cours">
+      <div class="banner" id="level-banner" data-level="2ACSC">
+        <span class="eyebrow" id="banner-tag">2ème année collège · 2ACSC</span>
+        <h1 id="banner-title">Cours de langue française</h1>
+        <p id="banner-description">Grammaire, conjugaison, orthographe, vocabulaire et expression écrite.</p>
+      </div>
+      <div class="toolbar">
+        <div class="filters" id="subject-filters" aria-label="Matière étudiée"><span class="subject-tag" data-subject="Français">🇫🇷 Langue française uniquement</span></div>
+        <label class="search-wrap"><span aria-hidden="true">⌕</span><input id="course-search" type="search" placeholder="Rechercher une leçon…" aria-label="Rechercher une leçon"></label>
+      </div>
+      <div class="section-heading"><h2>Mes cours</h2><span id="course-count" aria-live="polite"></span></div>
+      <div class="course-grid" id="courses-container"></div>
+      <article class="lesson" id="course-reader" hidden>
+        <div class="lesson-head">
+          <div><span class="subject-tag" id="reader-subject"></span><h2 id="reader-title"></h2></div>
+          <button class="icon-button" id="close-reader" type="button" aria-label="Fermer la leçon">✕</button>
+        </div>
+        <div class="lesson-content" id="reader-content"></div>
+        <div class="lesson-actions">
+          <button class="secondary-button" id="ask-about-course" type="button">✦ Demander une explication au tuteur local</button>
+          <button class="text-button" id="close-reader-link" type="button">Fermer la leçon</button>
+        </div>
+      </article>
+    </section>
+
+    <aside class="tutor" aria-label="Tuteur pédagogique local">
+      <div class="tutor-header">
+        <div class="tutor-brand">
+          <div class="tutor-avatar" aria-hidden="true">✦</div>
+          <div><h2>Tuteur pédagogique local</h2><p>Fonctionne sans Internet ni compte</p></div>
+        </div>
+        <button class="icon-button" id="clear-chat" type="button" title="Effacer la conversation" aria-label="Effacer la conversation">⌫</button>
+      </div>
+      <div class="tutor-context"><span>Classe : <strong id="chat-level">2ème année collège</strong></span><span>Réponses hors ligne · Français</span></div>
+      <div class="chat-messages" id="chat-messages" aria-live="polite" aria-label="Conversation"></div>
+      <div class="suggestions" aria-label="Suggestions de questions">
+        <button type="button" data-prompt="Explique-moi le cours sélectionné simplement.">💡 Expliquer</button>
+        <button type="button" data-prompt="Propose-moi un exercice avec sa correction.">✎ Exercice corrigé</button>
+        <button type="button" data-prompt="Fais-moi un résumé de cette leçon.">▤ Résumer</button>
+      </div>
+      <form class="chat-form" id="chat-form">
+        <input id="chat-input" type="text" placeholder="Pose une question sur ta leçon…" autocomplete="off" aria-label="Ta question">
+        <button type="submit" aria-label="Envoyer">➤</button>
+      </form>
+    </aside>
+  </main>
+  <footer>Application autonome · Tes cours personnalisés sont enregistrés dans le stockage local de ce navigateur.</footer>
+  <div class="notice" id="notice" role="status" hidden></div>
+
+  <dialog id="course-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading"><h2 id="dialog-title">Ajouter une leçon</h2><button class="close-dialog" id="close-dialog" type="button" aria-label="Fermer">×</button></div>
+      <form class="course-form" id="course-form">
+        <label>Niveau scolaire
+          <select id="form-level"><option value="1ACSC">1ACSC · 1ère année collège</option><option value="2ACSC">2ACSC · 2ème année collège</option><option value="3ACSC">3ACSC · 3ème année collège</option></select>
+        </label>
+        <div class="form-row">
+          <label>Matière
+            <select id="form-subject"><option>Français</option></select>
+          </label>
+          <label>Icône
+            <select id="form-icon"><option value="♫">♫ Musique</option></select>
+          </label>
+        </div>
+        <label>Titre de la leçon<input id="form-title" required maxlength="120" placeholder="Ex. Les nombres relatifs"></label>
+        <label>Résumé court<input id="form-summary" required maxlength="240" placeholder="L'idée principale de la leçon"></label>
+        <label>Contenu du cours<textarea id="form-content" required rows="7" placeholder="Écris ou colle le contenu de la leçon…"></textarea></label>
+        <div class="form-actions"><button class="primary-button" type="submit">Enregistrer le cours</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <script>
+    "use strict";
+
+    const defaultCourses = [
+      {
+        id: "1ac-fr-phrases", level: "1ACSC", subject: "Français", icon: "♫",
+        title: "Les types et les formes de phrases",
+        summary: "Reconnaître les phrases déclaratives, interrogatives, exclamatives et impératives.",
+        content: `1. Les quatre types de phrases
+La phrase déclarative donne une information et se termine par un point.
+La phrase interrogative pose une question et se termine par un point d'interrogation.
+La phrase exclamative exprime une émotion et se termine par un point d'exclamation.
+La phrase impérative donne un ordre ou un conseil.
+
+2. Les formes de phrases
+Une phrase peut être affirmative ou négative. La négation se construit souvent avec « ne… pas ».
+Exemples : « Il joue. » → « Il ne joue pas. »
+
+3. Ponctuation
+Chaque phrase commence par une majuscule et se termine par un signe adapté à son type.`
+      },
+      {
+        id: "1ac-fr-present", level: "1ACSC", subject: "Français", icon: "♫",
+        title: "Le présent de l'indicatif",
+        summary: "Conjuguer les verbes usuels et employer correctement le présent.",
+        content: `1. Les verbes du premier groupe
+Les verbes en -er prennent généralement les terminaisons -e, -es, -e, -ons, -ez, -ent.
+Exemple : je chante, tu chantes, il chante, nous chantons, vous chantez, ils chantent.
+
+2. Être et avoir
+Être : je suis, tu es, il est, nous sommes, vous êtes, ils sont.
+Avoir : j'ai, tu as, il a, nous avons, vous avez, ils ont.
+
+3. Emploi du présent
+Le présent exprime une action actuelle, une habitude ou un fait général.
+Exemple : « Chaque matin, Lina prend le bus. »`
+      },
+      {
+        id: "1ac-fr-groupe-nominal", level: "1ACSC", subject: "Français", icon: "♫",
+        title: "Le groupe nominal",
+        summary: "Identifier le nom noyau et les mots qui l'accompagnent.",
+        content: `1. Le nom noyau
+Le groupe nominal est organisé autour d'un nom, appelé nom noyau.
+Exemple : dans « le joli jardin », le nom noyau est « jardin ».
+
+2. Les déterminants et les adjectifs
+Le déterminant accompagne le nom : un, une, le, la, des, mes…
+L'adjectif donne une précision sur le nom : un jardin fleuri.
+
+3. Les accords
+Le déterminant et l'adjectif s'accordent généralement en genre et en nombre avec le nom.
+Exemples : un petit chat ; des petites chattes.`
+      },
+      {
+        id: "1ac-fr-description", level: "1ACSC", subject: "Français", icon: "♫",
+        title: "Décrire une personne ou un lieu",
+        summary: "Organiser une description et choisir des adjectifs précis.",
+        content: `1. Organiser la description
+Présente d'abord la personne ou le lieu, puis décris les détails du général au particulier.
+
+2. Employer des mots précis
+Utilise des adjectifs et des groupes nominaux pour donner des détails.
+Exemple : « Une grande maison aux volets bleus se trouve près du jardin. »
+
+3. Relier ses idées
+Les indicateurs de lieu comme « à gauche », « au fond » et « près de » aident le lecteur à imaginer la scène.
+Relis les accords entre les noms et les adjectifs.`
+      },
+      {
+        id: "2ac-fr-grammaire", level: "2ACSC", subject: "Français", icon: "♫",
+        title: "Les classes grammaticales et les fonctions",
+        summary: "Reconnaître la nature des mots et leur rôle dans la phrase.",
+        content: `1. La nature des mots
+La nature (ou classe grammaticale) indique ce qu'est un mot : nom, déterminant, adjectif, pronom, verbe, adverbe, préposition ou conjonction.
+Exemple : dans « Le petit chat dort », « chat » est un nom et « petit » est un adjectif.
+
+2. La fonction des mots
+La fonction indique le rôle d'un mot ou d'un groupe de mots dans la phrase : sujet, complément d'objet, complément circonstanciel ou attribut du sujet.
+Exemple : dans « Le chat poursuit la souris », « Le chat » est sujet et « la souris » est COD.
+
+3. Astuce
+Pour trouver le sujet, demande « Qui est-ce qui… ? » avant le verbe.
+Pour trouver le COD, demande « qui ? » ou « quoi ? » après le verbe.`
+      },
+      {
+        id: "2ac-fr-conjugaison", level: "2ACSC", subject: "Français", icon: "♫",
+        title: "Le passé composé et l'imparfait",
+        summary: "Choisir entre une action achevée et une action de description ou d'habitude.",
+        content: `1. Le passé composé
+Il exprime une action achevée. Il se forme avec l'auxiliaire avoir ou être au présent, suivi du participe passé.
+Exemple : « Nous avons terminé l'exercice. » Avec être, le participe passé s'accorde avec le sujet : « Elles sont arrivées. »
+
+2. L'imparfait
+Il exprime une description, une habitude ou une action qui dure dans le passé.
+Pour le former, on prend généralement la forme « nous » au présent, on enlève -ons et on ajoute : -ais, -ais, -ait, -ions, -iez, -aient.
+Exemple : nous finissons → je finissais.
+
+3. Dans un récit
+L'imparfait plante souvent le décor ; le passé composé raconte les événements.
+Exemple : « Il pleuvait quand le bus est arrivé. »`
+      },
+      {
+        id: "2ac-fr-accords", level: "2ACSC", subject: "Français", icon: "♫",
+        title: "Les accords dans le groupe nominal",
+        summary: "Accorder le déterminant, le nom et l'adjectif en genre et en nombre.",
+        content: `1. L'accord en genre
+Le déterminant et l'adjectif s'accordent avec le nom au masculin ou au féminin.
+Exemple : un grand jardin ; une grande maison.
+
+2. L'accord en nombre
+Au pluriel, le déterminant, le nom et l'adjectif prennent généralement un -s.
+Exemple : ces petits chats ; des fleurs colorées.
+
+3. Méthode de vérification
+Repère le nom principal, puis vérifie que son déterminant et ses adjectifs s'accordent avec lui.
+Attention aux formes particulières : beau / belle, nouveau / nouvelle, cheval / chevaux.`
+      },
+      {
+        id: "2ac-fr-orthographe", level: "2ACSC", subject: "Français", icon: "♫",
+        title: "Les homophones grammaticaux",
+        summary: "Distinguer a/à, et/est, son/sont et ou/où.",
+        content: `1. a / à
+« a » est le verbe avoir : on peut le remplacer par « avait ». « à » est une préposition.
+Exemple : « Il a un livre à lire. »
+
+2. et / est
+« et » peut être remplacé par « et puis ». « est » est le verbe être : on peut le remplacer par « était ».
+Exemple : « Le ciel est gris et le vent souffle. »
+
+3. son / sont ; ou / où
+« son » accompagne un nom ; « sont » peut être remplacé par « étaient ».
+« ou » exprime un choix ; « où » indique un lieu ou un moment.
+Exemples : « son cahier », « ils sont prêts », « thé ou café ? », « la ville où je vis ».`
+      },
+      {
+        id: "2ac-fr-vocabulaire", level: "2ACSC", subject: "Français", icon: "♫",
+        title: "Le vocabulaire : synonymes et antonymes",
+        summary: "Enrichir son expression en choisissant des mots précis.",
+        content: `1. Les synonymes
+Deux mots synonymes ont un sens proche. Le synonyme choisi dépend du contexte.
+Exemple : « content » peut devenir « heureux » ou « satisfait ».
+
+2. Les antonymes
+Deux mots antonymes ont des sens opposés.
+Exemple : « entrer » / « sortir », « courageux » / « peureux ».
+On peut parfois former un contraire avec un préfixe : possible / impossible.
+
+3. Choisir le mot juste
+Remplace un mot seulement après avoir vérifié que le sens de la phrase reste correct.
+Utilise un dictionnaire pour connaître les différents sens d'un mot.`
+      },
+      {
+        id: "2ac-fr-redaction", level: "2ACSC", subject: "Français", icon: "♫",
+        title: "Réussir un paragraphe narratif",
+        summary: "Organiser un récit avec une situation, des actions et une conclusion.",
+        content: `1. Préparer ses idées
+Détermine qui raconte, où et quand l'histoire se déroule, et quel événement va se produire.
+
+2. Organiser le paragraphe
+Présente la situation, raconte les actions dans l'ordre et termine par une conséquence ou une conclusion.
+Utilise des connecteurs : d'abord, ensuite, soudain, enfin.
+
+3. Relire et améliorer
+Vérifie les majuscules, la ponctuation, les accords et les temps des verbes.
+Évite de répéter le même mot : emploie un pronom ou un synonyme adapté.`
+      },
+      {
+        id: "3ac-fr-propositions", level: "3ACSC", subject: "Français", icon: "♫",
+        title: "La phrase simple et la phrase complexe",
+        summary: "Distinguer les propositions et repérer les verbes conjugués.",
+        content: `1. La phrase simple
+Une phrase simple contient un seul verbe conjugué et une seule proposition.
+Exemple : « Le train arrive. »
+
+2. La phrase complexe
+Une phrase complexe contient plusieurs propositions. Pour les repérer, cherche les verbes conjugués.
+Exemple : « Le train arrive et les voyageurs descendent. »
+
+3. Relier les propositions
+Les propositions peuvent être reliées par juxtaposition (virgule, point-virgule, deux-points), coordination (mais, ou, et, donc, or, ni, car) ou subordination (parce que, lorsque, qui…).`
+      },
+      {
+        id: "3ac-fr-voix", level: "3ACSC", subject: "Français", icon: "♫",
+        title: "La voix active et la voix passive",
+        summary: "Observer le rôle du sujet et transformer une phrase à la voix passive.",
+        content: `1. La voix active
+À la voix active, le sujet fait l'action.
+Exemple : « Le jardinier arrose les fleurs. »
+
+2. La voix passive
+À la voix passive, le sujet reçoit l'action. Le verbe se forme avec être et le participe passé.
+Exemple : « Les fleurs sont arrosées par le jardinier. »
+
+3. Transformer une phrase
+Le COD de la phrase active devient le sujet de la phrase passive. Le sujet actif peut devenir un complément introduit par « par ».
+Le participe passé s'accorde avec le sujet de la phrase passive.`
+      },
+      {
+        id: "3ac-fr-discours", level: "3ACSC", subject: "Français", icon: "♫",
+        title: "Le discours direct et le discours indirect",
+        summary: "Rapporter les paroles d'un personnage de deux manières.",
+        content: `1. Le discours direct
+Les paroles sont rapportées telles qu'elles ont été prononcées. Elles sont souvent introduites par un verbe de parole et des guillemets.
+Exemple : Sara dit : « Je partirai demain. »
+
+2. Le discours indirect
+Les paroles sont intégrées dans une phrase avec « que », « si » ou un mot interrogatif.
+Exemple : Sara dit qu'elle partira le lendemain.
+
+3. Les changements à observer
+Au discours indirect, les pronoms, les repères de temps et parfois les temps des verbes s'adaptent à la phrase qui rapporte les paroles.`
+      },
+      {
+        id: "3ac-fr-argumentation", level: "3ACSC", subject: "Français", icon: "♫",
+        title: "Exprimer et défendre une opinion",
+        summary: "Construire un avis clair avec des arguments et des exemples.",
+        content: `1. Présenter son opinion
+Exprime clairement ton point de vue : « À mon avis… », « Je pense que… »
+
+2. Donner des arguments
+Un argument explique pourquoi tu défends cette opinion. Appuie-le sur un exemple précis.
+Exemple : « La lecture est utile, car elle enrichit le vocabulaire. Par exemple… »
+
+3. Organiser le texte
+Présente le sujet, développe deux ou trois arguments reliés par des connecteurs (d'abord, ensuite, enfin), puis termine par une conclusion.
+Relis la ponctuation, les accords et les répétitions.`
+      }
+    ];
+
+    const storageKey = "college-plus-courses-v1";
+    const levelLabels = {
+      "1ACSC": "1ère année collège",
+      "2ACSC": "2ème année collège",
+      "3ACSC": "3ème année collège"
+    };
+    let currentLevel = "2ACSC";
+    let selectedCourse = null;
+    let customCourses = [];
+    let noticeTimer;
+
+    const elements = {
+      banner: document.getElementById("level-banner"),
+      bannerTag: document.getElementById("banner-tag"),
+      bannerTitle: document.getElementById("banner-title"),
+      bannerDescription: document.getElementById("banner-description"),
+      filters: document.getElementById("subject-filters"),
+      search: document.getElementById("course-search"),
+      courses: document.getElementById("courses-container"),
+      count: document.getElementById("course-count"),
+      reader: document.getElementById("course-reader"),
+      chat: document.getElementById("chat-messages"),
+      notice: document.getElementById("notice"),
+      dialog: document.getElementById("course-dialog")
+    };
+
+    function showNotice(message) {
+      elements.notice.textContent = message;
+      elements.notice.hidden = false;
+      window.clearTimeout(noticeTimer);
+      noticeTimer = window.setTimeout(() => { elements.notice.hidden = true; }, 5000);
+    }
+
+    function loadCustomCourses() {
+      try {
+        const saved = window.localStorage.getItem(storageKey);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed) || parsed.some(course =>
+          !course || typeof course.id !== "string" || typeof course.level !== "string" ||
+          typeof course.subject !== "string" || typeof course.title !== "string" ||
+          typeof course.summary !== "string" || typeof course.content !== "string"
+        )) {
+          throw new Error("Les données enregistrées ne sont pas valides.");
+        }
+        customCourses = parsed;
+      } catch (error) {
+        showNotice(`Impossible de charger les cours enregistrés : ${error.message}`);
+      }
+    }
+
+    function saveCustomCourses() {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(customCourses));
+        return true;
+      } catch (error) {
+        showNotice(`Cours ajouté pour cette session, mais impossible de le sauvegarder : ${error.message}`);
+        return false;
+      }
+    }
+
+    function getCourses() {
+      const savedFrenchCourses = customCourses
+        .filter(course => course.subject === "Français")
+        .map(course => ({ ...course, icon: "♫" }));
+      return [...savedFrenchCourses, ...defaultCourses];
+    }
+
+    function createElement(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+
+    function switchLevel(level) {
+      if (!Object.hasOwn(levelLabels, level)) return;
+      currentLevel = level;
+      document.querySelectorAll(".level-tab").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.level === level));
+      });
+      elements.banner.dataset.level = level;
+      elements.bannerTag.textContent = `${levelLabels[level]} · ${level}`;
+      document.getElementById("chat-level").textContent = levelLabels[level];
+      document.getElementById("form-level").value = level;
+      elements.search.value = "";
+      closeReader();
+      renderCourses();
+    }
+
+    function renderCourses() {
+      const query = elements.search.value.trim().toLocaleLowerCase("fr");
+      const matches = getCourses().filter(course => {
+        const searchable = `${course.title} ${course.summary} ${course.subject}`.toLocaleLowerCase("fr");
+        return course.level === currentLevel && course.subject === "Français" &&
+          searchable.includes(query);
+      });
+      elements.courses.replaceChildren();
+      elements.count.textContent = `${matches.length} ${matches.length > 1 ? "leçons" : "leçon"}`;
+
+      if (!matches.length) {
+        const empty = createElement("div", "empty-state");
+        empty.append(createElement("strong", "", "Aucun cours trouvé"));
+        empty.append(createElement("span", "", "Modifie les filtres ou ajoute une nouvelle leçon."));
+        elements.courses.append(empty);
+        return;
+      }
+
+      matches.forEach(course => {
+        const card = createElement("article", "course-card");
+        const top = createElement("div", "card-top");
+        const tag = createElement("span", "subject-tag", course.subject);
+        tag.dataset.subject = course.subject;
+        top.append(tag, createElement("span", "subject-icon", course.icon || "📘"));
+        const title = createElement("h3", "", course.title);
+        const summary = createElement("p", "", course.summary);
+        const actions = createElement("div", "card-actions");
+        const readButton = createElement("button", "text-button", "Lire la leçon →");
+        readButton.type = "button";
+        readButton.addEventListener("click", () => openReader(course));
+        const explainButton = createElement("button", "icon-button", "✦");
+        explainButton.type = "button";
+        explainButton.title = "Demander une explication au tuteur local";
+        explainButton.setAttribute("aria-label", `Demander une explication sur ${course.title}`);
+        explainButton.addEventListener("click", () => {
+          selectedCourse = course;
+          appendMessage(`Explique-moi le cours « ${course.title} » simplement.`, "user");
+          appendMessage(makeLocalReply("Explique-moi ce cours simplement."));
+        });
+        actions.append(readButton, explainButton);
+        card.append(top, title, summary, actions);
+        elements.courses.append(card);
+      });
+    }
+
+    function openReader(course) {
+      selectedCourse = course;
+      const tag = document.getElementById("reader-subject");
+      tag.textContent = `${course.level} · ${course.subject}`;
+      tag.dataset.subject = course.subject;
+      document.getElementById("reader-title").textContent = course.title;
+      document.getElementById("reader-content").textContent = course.content;
+      elements.reader.hidden = false;
+      elements.reader.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeReader() {
+      elements.reader.hidden = true;
+      selectedCourse = null;
+    }
+
+    function appendMessage(text, role) {
+      const row = createElement("div", `message ${role === "user" ? "user" : "assistant"}`);
+      const avatar = createElement("div", "message-avatar", role === "user" ? "●" : "✦");
+      avatar.setAttribute("aria-hidden", "true");
+      const bubble = createElement("div", "message-bubble", text);
+      row.append(avatar, bubble);
+      elements.chat.append(row);
+      elements.chat.scrollTop = elements.chat.scrollHeight;
+    }
+
+    function makeLocalReply(question) {
+      const normalized = question.toLocaleLowerCase("fr");
+      if (!selectedCourse) {
+        return `Je fonctionne hors ligne avec des réponses guidées, pas avec une IA générative. Choisis d'abord une leçon de français pour que je puisse m'appuyer sur son contenu.`;
+      }
+
+      const course = selectedCourse;
+      if (normalized.includes("résum")) {
+        return `Résumé — ${course.title}\n${course.summary}\n\nÀ retenir :\n${course.content.split("\n\n").slice(0, 3).join("\n\n")}`;
+      }
+      if (normalized.includes("exercice") || normalized.includes("corrig")) {
+        const exercises = {
+          "1ac-fr-phrases": "Exercice : transforme « Tu viens. » en phrase interrogative puis en phrase négative.\nCorrection : « Viens-tu ? » ou « Est-ce que tu viens ? » ; « Tu ne viens pas. »",
+          "1ac-fr-present": "Exercice : conjugue « chanter » au présent avec « nous » et « vous ».\nCorrection : nous chantons ; vous chantez.",
+          "1ac-fr-groupe-nominal": "Exercice : repère le nom noyau dans « les belles fleurs rouges ».\nCorrection : le nom noyau est « fleurs » ; « les » est le déterminant et « belles », « rouges » sont des adjectifs.",
+          "1ac-fr-description": "Exercice : ajoute deux détails à « La maison est près du parc. »\nCorrection possible : « La grande maison aux volets verts est près du parc. »",
+          "2ac-fr-grammaire": "Exercice : dans « Les élèves lisent un roman », trouve le sujet et le COD.\nCorrection : « Les élèves » est le sujet ; « un roman » est le COD.",
+          "2ac-fr-conjugaison": "Exercice : complète : « Hier, nous (visiter) le musée pendant qu'il (pleuvoir). »\nCorrection : « Hier, nous avons visité le musée pendant qu'il pleuvait. »",
+          "2ac-fr-accords": "Exercice : accorde « les (petit) fille (curieux) ».\nCorrection : « les petites filles curieuses ».",
+          "2ac-fr-orthographe": "Exercice : complète : « Il __ préparé __ sac __ il part. »\nCorrection : « Il a préparé son sac et il part. »",
+          "2ac-fr-vocabulaire": "Exercice : donne un synonyme de « joyeux » et un antonyme de « rapide ».\nCorrection possible : « heureux » et « lent ».",
+          "2ac-fr-redaction": "Exercice : écris une phrase pour chaque étape d'un récit : début, événement, conclusion.\nCorrection : vérifie que les événements sont dans l'ordre et reliés par des connecteurs comme « d'abord », « ensuite » et « enfin ».",
+          "3ac-fr-propositions": "Exercice : combien y a-t-il de propositions dans « Il ouvre le livre et il commence à lire » ?\nCorrection : deux propositions, avec les verbes conjugués « ouvre » et « commence », reliées par « et ».",
+          "3ac-fr-voix": "Exercice : transforme à la voix passive : « Le professeur corrige les copies. »\nCorrection : « Les copies sont corrigées par le professeur. »",
+          "3ac-fr-discours": "Exercice : transforme au discours indirect : Lina dit : « Je suis prête. »\nCorrection : Lina dit qu'elle est prête.",
+          "3ac-fr-argumentation": "Exercice : donne un argument pour encourager la lecture.\nCorrection possible : « La lecture développe le vocabulaire ; par exemple, elle permet de découvrir des mots nouveaux dans les histoires. »"
+        };
+        return exercises[course.id] || `Exercice : explique avec tes mots l'idée principale de « ${course.title} ».\nCorrection attendue : ${course.summary}`;
+      }
+      if (normalized.includes("explique") || normalized.includes("simplement") || normalized.includes("comprendre")) {
+        return `Bien sûr !\n\n${course.title}\n${course.summary}\n\nVoici le contenu de la leçon pour t'aider :\n${course.content}`;
+      }
+
+      const paragraphs = course.content.split("\n\n");
+      const keyword = normalized.split(/\W+/).filter(word => word.length > 3)
+        .find(word => course.content.toLocaleLowerCase("fr").includes(word));
+      const relevantParagraph = keyword
+        ? paragraphs.find(paragraph => paragraph.toLocaleLowerCase("fr").includes(keyword))
+        : null;
+      if (relevantParagraph) {
+        return `Dans la leçon « ${course.title} », voici le passage qui correspond à ta question :\n\n${relevantParagraph}\n\nRelis cette partie et essaie de la reformuler avec tes propres mots.`;
+      }
+      return `Je peux t'aider à réviser « ${course.title} ».\n\nÀ retenir : ${course.summary}\n\nJe suis un tuteur local simple et mes réponses sont limitées au contenu enregistré. Essaie les boutons « Expliquer », « Exercice corrigé » ou « Résumer » pour continuer.`;
+    }
+
+    function sendQuestion(question) {
+      const cleanQuestion = question.trim();
+      if (!cleanQuestion) return;
+      appendMessage(cleanQuestion, "user");
+      appendMessage(makeLocalReply(cleanQuestion));
+    }
+
+    document.querySelectorAll(".level-tab").forEach(button => {
+      button.addEventListener("click", () => switchLevel(button.dataset.level));
+    });
+    elements.search.addEventListener("input", renderCourses);
+    document.getElementById("close-reader").addEventListener("click", closeReader);
+    document.getElementById("close-reader-link").addEventListener("click", closeReader);
+    document.getElementById("ask-about-course").addEventListener("click", () => {
+      if (selectedCourse) sendQuestion("Explique-moi le cours sélectionné simplement.");
+    });
+    document.getElementById("chat-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = document.getElementById("chat-input");
+      sendQuestion(input.value);
+      input.value = "";
+      input.focus();
+    });
+    document.querySelectorAll(".suggestions button").forEach(button => {
+      button.addEventListener("click", () => sendQuestion(button.dataset.prompt));
+    });
+    document.getElementById("clear-chat").addEventListener("click", () => {
+      elements.chat.replaceChildren();
+      appendMessage(`Bonjour ! Je suis le tuteur pédagogique local de Prof. Abdelghani. Choisis une leçon de français de ${levelLabels[currentLevel]} pour commencer.`, "assistant");
+    });
+    document.getElementById("open-course-form").addEventListener("click", () => {
+      document.getElementById("form-level").value = currentLevel;
+      elements.dialog.showModal();
+      document.getElementById("form-title").focus();
+    });
+    document.getElementById("close-dialog").addEventListener("click", () => elements.dialog.close());
+    elements.dialog.addEventListener("click", event => {
+      if (event.target === elements.dialog) elements.dialog.close();
+    });
+    document.getElementById("course-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const course = {
+        id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        level: document.getElementById("form-level").value,
+        subject: "Français",
+        icon: "♫",
+        title: document.getElementById("form-title").value.trim(),
+        summary: document.getElementById("form-summary").value.trim(),
+        content: document.getElementById("form-content").value.trim()
+      };
+      if (!course.title || !course.summary || !course.content) return;
+      customCourses.unshift(course);
+      const saved = saveCustomCourses();
+      elements.dialog.close();
+      event.currentTarget.reset();
+      if (currentLevel !== course.level) switchLevel(course.level);
+      else renderCourses();
+      if (saved) showNotice("Le cours a été ajouté et sauvegardé dans ce navigateur.");
+    });
+
+    loadCustomCourses();
+    renderCourses();
+    appendMessage(`Bonjour ! Je suis le tuteur pédagogique local de Prof. Abdelghani. Sélectionne une leçon de français de ${levelLabels[currentLevel]} pour commencer. Mes réponses fonctionnent sans connexion Internet.`, "assistant");
+  </script>
+</body>
+</html>
